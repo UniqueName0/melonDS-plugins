@@ -308,6 +308,7 @@ void EmuThread::run()
             else
             {
                 nlines = emuInstance->nds->RunFrame();
+                emuInstance->pluginManager->frame();
             }
 
             if (emuInstance->ndsSave)
@@ -341,7 +342,7 @@ void EmuThread::run()
                 emit windowUpdate();
                 winUpdateCount = 0;
             }
-            
+
             if (emuInstance->hotkeyPressed(HK_FastForwardToggle)) emuInstance->fastForwardToggled = !emuInstance->fastForwardToggled;
             if (emuInstance->hotkeyPressed(HK_SlowMoToggle)) emuInstance->slowmoToggled = !emuInstance->slowmoToggled;
 
@@ -425,7 +426,7 @@ void EmuThread::run()
                 winUpdateFreq = fps / (u32)round(fpstarget);
                 if (winUpdateFreq < 1)
                     winUpdateFreq = 1;
-                    
+
                 double actualfps = (59.8261 * 263.0) / nlines;
                 int inst = emuInstance->instanceID;
                 if (inst == 0)

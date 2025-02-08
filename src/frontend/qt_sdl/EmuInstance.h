@@ -27,6 +27,7 @@
 #include "Window.h"
 #include "Config.h"
 #include "SaveManager.h"
+#include "PluginManager.h"
 
 const int kMaxWindows = 4;
 
@@ -80,6 +81,8 @@ class EmuInstance
 public:
     EmuInstance(int inst);
     ~EmuInstance();
+
+    PluginManager* pluginManager;
 
     int getInstanceID() { return instanceID; }
     int getConsoleType() { return consoleType; }

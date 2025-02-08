@@ -662,6 +662,19 @@ MainWindow::MainWindow(int id, EmuInstance* inst, QWidget* parent) :
             connect(actAudioSync, &QAction::triggered, this, &MainWindow::onChangeAudioSync);
         }
         {
+            {
+                QMenu* menu = menubar->addMenu("Tools");
+                for (int i = 0; i < emuInstance->pluginManager->plugins.size(); ++i) {
+                    Plugin* plugin = emuInstance->pluginManager->plugins.at(i);
+                    plugin->registerSignal(menu, this);
+                    connect(plugin->checkAction, &QAction::triggered,
+                        [&, plugin_ptr = plugin](bool checked){
+                        plugin_ptr->toggleEnabled(checked);
+                      });
+                }
+            }
+        }
+        {
             QMenu * menu = menubar->addMenu("Help");
             actAbout = menu->addAction("About...");
             connect(actAbout, &QAction::triggered, this, [&]
@@ -1115,7 +1128,7 @@ bool MainWindow::preloadROMs(QStringList file, QStringList gbafile, bool boot)
                 return false;
             }
         }
-        
+
         recentFileList.removeAll(file.join("|"));
         recentFileList.prepend(file.join("|"));
         updateRecentFilesMenu();

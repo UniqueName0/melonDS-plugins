@@ -111,6 +111,7 @@ ScreenLayout::ScreenLayout()
     M23_Identity(TopScreenMtx);
     M23_Identity(BotScreenMtx);
     M23_Identity(HybScreenMtx);
+    M23_Identity(TopTouchMtx);
     M23_Identity(TouchMtx);
     M23_Identity(HybTouchMtx);
     TopEnable = true;
@@ -151,8 +152,10 @@ void ScreenLayout::Setup(int screenWidth, int screenHeight,
         ? rotation % 2
         : screenLayout - 1;
 
+    float topScale = 1;
     float botScale = 1;
     float hybScale = 1;
+    float topTrans[4] = {0};
     float botTrans[4] = {0};
     float hybTrans[2] = {0};
 
@@ -200,6 +203,7 @@ void ScreenLayout::Setup(int screenWidth, int screenHeight,
 
         TopEnable = sizing == screenSizing_TopOnly;
         BotEnable = sizing == screenSizing_BotOnly;
+        topScale = scale;
         botScale = scale;
 
         M23_Scale(mtx, scale);
@@ -239,6 +243,7 @@ void ScreenLayout::Setup(int screenWidth, int screenHeight,
             refpoints[3][idx] += offsetBot;
 
             botTrans[idx] = offsetBot;
+            topTrans[idx] = offsetTop;
         }
 
         // scale
@@ -288,6 +293,7 @@ void ScreenLayout::Setup(int screenWidth, int screenHeight,
                     refpoints[i][1] *= scale;
                 }
 
+                topScale = scale;
                 botScale = scale;
 
                 // move screens aside
@@ -385,6 +391,7 @@ void ScreenLayout::Setup(int screenWidth, int screenHeight,
                 refpoints[secOffset+1][1] *= secScale;
 
                 botScale = (sizing == screenSizing_EmphTop) ? secScale : primScale;
+                topScale = (sizing == screenSizing_EmphTop) ? primScale : secScale;
             }
         }
     }
@@ -412,6 +419,7 @@ void ScreenLayout::Setup(int screenWidth, int screenHeight,
         M23_Translate(BotScreenMtx, tx, ty);
         M23_Translate(HybScreenMtx, tx, ty);
 
+        topTrans[2] += tx; topTrans[3] += ty;
         botTrans[2] += tx; botTrans[3] += ty;
         hybTrans[0] += tx; hybTrans[1] += ty;
     }
@@ -443,6 +451,24 @@ void ScreenLayout::Setup(int screenWidth, int screenHeight,
             M23_Scale(HybTouchMtx, 1.f/hybScale);
             M23_Multiply(HybTouchMtx, rotmtx, HybTouchMtx);
         }
+    }
+
+    if (TopEnable)
+    {
+
+        M23_Identity(TopTouchMtx);
+
+        M23_Translate(TopTouchMtx, -topTrans[2], -topTrans[3]);
+        M23_Scale(TopTouchMtx, 1.f / topScale);
+        M23_Translate(TopTouchMtx, -topTrans[0], -topTrans[1]);
+
+        float rotmtx[6];
+        M23_Identity(rotmtx);
+        M23_RotateFast(rotmtx, (4-rotation) & 3);
+        M23_Multiply(TopTouchMtx, rotmtx, TopTouchMtx);
+
+        M23_Scale(TopTouchMtx, 1.f/topAspect, 1);
+        M23_Translate(TopTouchMtx, 256/2, 192/2);
     }
 }
 
@@ -524,6 +550,36 @@ bool ScreenLayout::GetTouchCoords(int& x, int& y, bool clamp)
         float vy = y;
 
         M23_Transform(TouchMtx, vx, vy);
+
+        if (clamp)
+        {
+            x = std::clamp((int)vx, 0, 255);
+            y = std::clamp((int)vy, 0, 191);
+
+            return true;
+        }
+        else
+        {
+            if (vx >= 0 && vx < 256 && vy >= 0 && vy < 192)
+            {
+                x = (int)vx;
+                y = (int)vy;
+
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+bool ScreenLayout::GetTouchCoordsTopScreen(int& x, int& y, bool clamp)
+{
+    if (TopEnable) {
+        float vx = x;
+        float vy = y;
+
+        M23_Transform(TopTouchMtx, vx, vy);
 
         if (clamp)
         {

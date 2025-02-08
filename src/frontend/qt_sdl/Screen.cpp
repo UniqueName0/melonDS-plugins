@@ -79,7 +79,7 @@ ScreenPanel::ScreenPanel(QWidget* parent) : QWidget(parent)
 
     osdEnabled = false;
     osdID = 1;
-    
+
     loadConfig();
     setFilter(mainWindow->getWindowConfig().GetBool("ScreenFilter"));
 
@@ -116,7 +116,7 @@ ScreenPanel::~ScreenPanel()
 void ScreenPanel::loadConfig()
 {
     auto& cfg = mainWindow->getWindowConfig();
-    
+
     screenRotation = cfg.GetInt("ScreenRotation");
     screenGap = cfg.GetInt("ScreenGap");
     screenLayout = cfg.GetInt("ScreenLayout");
@@ -259,6 +259,11 @@ void ScreenPanel::mousePressEvent(QMouseEvent* event)
     {
         touching = true;
         emuInstance->touchScreen(x, y);
+        emuInstance->pluginManager->clickBottomScreen(x, y);
+    }
+    else if (layout.GetTouchCoordsTopScreen(x, y, false))
+    {
+        emuInstance->pluginManager->clickTopScreen(x, y);
     }
 }
 
@@ -805,6 +810,7 @@ void ScreenPanelNative::paintEvent(QPaintEvent* event)
         {
             painter.setTransform(screenTrans[i]);
             painter.drawImage(screenrc, screen[screenKind[i]]);
+            emuInstance->pluginManager->draw(i, &painter);
         }
         emuInstance->renderLock.unlock();
     }

@@ -235,6 +235,9 @@ public:
     ARMv5(melonDS::NDS& nds, std::optional<GDBArgs> gdb, bool jit);
     ~ARMv5();
 
+    void* PM_ptr;
+    void (*PM9step)(void*, unsigned int);
+
     void Reset() override;
 
     void DoSavestate(Savestate* file) override;
@@ -384,6 +387,9 @@ class ARMv4 : public ARM
 {
 public:
     ARMv4(melonDS::NDS& nds, std::optional<GDBArgs> gdb, bool jit);
+
+    void* PM_ptr;
+    void (*PM7step)(void*, unsigned int);
 
     void FillPipeline() override;
 

@@ -689,6 +689,9 @@ void ARMv5::Execute()
                 {
                     u32 icode = ((CurInstr >> 4) & 0xF) | ((CurInstr >> 16) & 0xFF0);
                     ARMInterpreter::ARMInstrTable[icode](this);
+
+                    u32 instrAddr = R[15] - ((CPSR&0x20)?2:4);
+                    PM9step(PM_ptr, instrAddr);
                 }
                 else if ((CurInstr & 0xFE000000) == 0xFA000000)
                 {
@@ -827,6 +830,9 @@ void ARMv4::Execute()
                 {
                     u32 icode = ((CurInstr >> 4) & 0xF) | ((CurInstr >> 16) & 0xFF0);
                     ARMInterpreter::ARMInstrTable[icode](this);
+
+                    u32 instrAddr = R[15] - ((CPSR&0x20)?2:4);
+                    PM7step(PM_ptr, instrAddr);
                 }
                 else
                     AddCycles_C();
@@ -1308,4 +1314,3 @@ void ARMv4::BusWrite32(u32 addr, u32 val)
     NDS.ARM7Write32(addr, val);
 }
 }
-

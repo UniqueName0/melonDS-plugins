@@ -69,6 +69,8 @@ EmuInstance::EmuInstance(int inst) : deleting(false),
     globalCfg(Config::GetGlobalTable()),
     localCfg(Config::GetLocalTable(inst))
 {
+    pluginManager = new PluginManager(this);
+
     consoleType = globalCfg.GetInt("Emu.ConsoleType");
 
     ndsSave = nullptr;
@@ -1352,6 +1354,7 @@ bool EmuInstance::updateConsole() noexcept
 
         nds->Reset();
         loadRTCData();
+        pluginManager->ndsInit();
         //emuThread->updateVideoRenderer(); // not actually needed?
     }
     else

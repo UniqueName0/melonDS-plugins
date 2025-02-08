@@ -87,11 +87,13 @@ public:
     // de-transform the provided host display coordinates to get coordinates
     // on the bottom screen
     bool GetTouchCoords(int& x, int& y, bool clamp);
+    bool GetTouchCoordsTopScreen(int& x, int& y, bool clamp);
 
 private:
     float TopScreenMtx[6];
     float BotScreenMtx[6];
     float HybScreenMtx[6];
+    float TopTouchMtx[6];
     float TouchMtx[6];
     float HybTouchMtx[6];
     bool TopEnable;
