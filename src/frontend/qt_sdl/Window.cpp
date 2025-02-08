@@ -663,7 +663,7 @@ MainWindow::MainWindow(int id, EmuInstance* inst, QWidget* parent) :
         }
         {
             {
-                QMenu* menu = menubar->addMenu("Tools");
+                QMenu* menu = menubar->addMenu("Plugins");
                 for (int i = 0; i < emuInstance->pluginManager->plugins.size(); ++i) {
                     Plugin* plugin = emuInstance->pluginManager->plugins.at(i);
                     plugin->registerSignal(menu, this);
