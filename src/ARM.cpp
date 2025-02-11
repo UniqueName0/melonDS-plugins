@@ -687,11 +687,11 @@ void ARMv5::Execute()
                 // actually execute
                 if (CheckCondition(CurInstr >> 28))
                 {
-                    u32 icode = ((CurInstr >> 4) & 0xF) | ((CurInstr >> 16) & 0xFF0);
-                    ARMInterpreter::ARMInstrTable[icode](this);
-
                     u32 instrAddr = R[15] - ((CPSR&0x20)?2:4);
                     PM9step(PM_ptr, instrAddr);
+
+                    u32 icode = ((CurInstr >> 4) & 0xF) | ((CurInstr >> 16) & 0xFF0);
+                    ARMInterpreter::ARMInstrTable[icode](this);
                 }
                 else if ((CurInstr & 0xFE000000) == 0xFA000000)
                 {
@@ -828,11 +828,11 @@ void ARMv4::Execute()
                 // actually execute
                 if (CheckCondition(CurInstr >> 28))
                 {
-                    u32 icode = ((CurInstr >> 4) & 0xF) | ((CurInstr >> 16) & 0xFF0);
-                    ARMInterpreter::ARMInstrTable[icode](this);
-
                     u32 instrAddr = R[15] - ((CPSR&0x20)?2:4);
                     PM7step(PM_ptr, instrAddr);
+
+                    u32 icode = ((CurInstr >> 4) & 0xF) | ((CurInstr >> 16) & 0xFF0);
+                    ARMInterpreter::ARMInstrTable[icode](this);
                 }
                 else
                     AddCycles_C();

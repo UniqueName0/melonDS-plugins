@@ -63,6 +63,19 @@ void PluginManager::clickBottomScreen(int x, int y)
     }
 }
 
+void PluginManager::onKeyPress(QKeyEvent* event) {
+    for (int i = 0; i < plugins.size(); ++i) {
+        Plugin* plugin = plugins.at(i);
+        if (plugin->enabled) plugin->onKeyPress(event);
+    }
+}
+
+void PluginManager::onKeyRelease(QKeyEvent* event) {
+    for (int i = 0; i < plugins.size(); ++i) {
+        Plugin* plugin = plugins.at(i);
+        if (plugin->enabled) plugin->onKeyRelease(event);
+    }
+}
 
 
 void PluginManager::frame(){
@@ -111,6 +124,8 @@ Plugin::Plugin(EmuInstance* emuInstance, const char* dir, const char* fileName)
 
     frame = lib->get_function<void()>("frame");
     draw = lib->get_function<void(int, QPainter*)>("draw");
+    onKeyPress = lib->get_function<void(QKeyEvent*)>("onKeyPress");
+    onKeyRelease = lib->get_function<void(QKeyEvent*)>("onKeyRelease");
     onEnable = lib->get_function<void()>("onEnable");
     onDisable = lib->get_function<void()>("onDisable");
     clickTopScreen = lib->get_function<void(int, int)>("clickTopScreen");

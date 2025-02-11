@@ -225,6 +225,8 @@ int getEventKeyVal(QKeyEvent* event)
 
 void EmuInstance::onKeyPress(QKeyEvent* event)
 {
+    pluginManager->onKeyPress(event);
+
     int keyHK = getEventKeyVal(event);
     int keyKP = keyHK;
     if (event->modifiers() != Qt::KeypadModifier)
@@ -241,6 +243,8 @@ void EmuInstance::onKeyPress(QKeyEvent* event)
 
 void EmuInstance::onKeyRelease(QKeyEvent* event)
 {
+    pluginManager->onKeyRelease(event);
+
     int keyHK = getEventKeyVal(event);
     int keyKP = keyHK;
     if (event->modifiers() != Qt::KeypadModifier)

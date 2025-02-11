@@ -32,6 +32,8 @@ class Plugin : public QWidget
 
     void (*frame)();
     void (*instr)();
+    void (*onKeyPress)(QKeyEvent*);
+    void (*onKeyRelease)(QKeyEvent*);
     void (*draw)(int, QPainter*);
     void (*onEnable)();
     void (*onDisable)();
@@ -58,6 +60,8 @@ public:
 
     void clickTopScreen(int x, int y);
     void clickBottomScreen(int x, int y);
+    void onKeyPress(QKeyEvent* event);
+    void onKeyRelease(QKeyEvent* event);
 
     void frame();
     void draw(int, QPainter*);
