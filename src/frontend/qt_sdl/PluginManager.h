@@ -40,6 +40,8 @@ class Plugin : public QWidget
     void (*clickTopScreen)(int, int);
     void (*clickBottomScreen)(int, int);
     void (*ARM9step)(unsigned int);
+    void (*ARM9read)(unsigned int, unsigned char);
+    void (*ARM9write)(unsigned int, unsigned char, void*);
     void (*ARM7step)(unsigned int);
 
 
@@ -70,6 +72,10 @@ public:
 };
 
 void ARM9step(void*, unsigned int);
+void ARM9read(void*, unsigned int, unsigned char);
+void ARM9write(void*, unsigned int, unsigned char, void*);
 void ARM7step(void*, unsigned int);
+void ARM7read(void*, unsigned int, unsigned char);
+void ARM7write(void*, unsigned int, unsigned char, void*);
 
 #endif //PLUGINMANAGER_H

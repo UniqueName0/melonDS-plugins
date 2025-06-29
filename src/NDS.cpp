@@ -1082,7 +1082,7 @@ void NDS::RegisterEventFuncs(u32 id, void* that, const std::initializer_list<Eve
     int i = 0;
     for (EventFunc func : funcs)
     {
-        evt.Funcs[i++] = func;        
+        evt.Funcs[i++] = func;
     }
 }
 
@@ -1100,7 +1100,7 @@ void NDS::ScheduleEvent(u32 id, bool periodic, s32 delay, u32 funcid, u32 param)
     if (SchedListMask & (1<<id))
     {
         Log(LogLevel::Debug, "!! EVENT %d ALREADY SCHEDULED\n", id);
-        return; 
+        return;
     }
 
     SchedEvent& evt = SchedList[id];
@@ -1903,6 +1903,8 @@ void NDS::debug(u32 param)
 
 u8 NDS::ARM9Read8(u32 addr)
 {
+    PM9read(PM_ptr, addr, 8);
+
     if ((addr & 0xFFFFF000) == 0xFFFF0000)
     {
         return *(u8*)&ARM9BIOS[addr & 0xFFF];
@@ -1962,6 +1964,8 @@ u8 NDS::ARM9Read8(u32 addr)
 
 u16 NDS::ARM9Read16(u32 addr)
 {
+    PM9read(PM_ptr, addr, 16);
+
     addr &= ~0x1;
 
     if ((addr & 0xFFFFF000) == 0xFFFF0000)
@@ -2022,6 +2026,8 @@ u16 NDS::ARM9Read16(u32 addr)
 
 u32 NDS::ARM9Read32(u32 addr)
 {
+    PM9read(PM_ptr, addr, 32);
+
     addr &= ~0x3;
 
     if ((addr & 0xFFFFF000) == 0xFFFF0000)
@@ -2085,6 +2091,8 @@ u32 NDS::ARM9Read32(u32 addr)
 
 void NDS::ARM9Write8(u32 addr, u8 val)
 {
+    PM9write(PM_ptr, addr, 8, &val);
+
     switch (addr & 0xFF000000)
     {
     case 0x02000000:
@@ -2124,6 +2132,8 @@ void NDS::ARM9Write8(u32 addr, u8 val)
 
 void NDS::ARM9Write16(u32 addr, u16 val)
 {
+    PM9write(PM_ptr, addr, 16, &val);
+
     addr &= ~0x1;
 
     switch (addr & 0xFF000000)
@@ -2184,6 +2194,8 @@ void NDS::ARM9Write16(u32 addr, u16 val)
 
 void NDS::ARM9Write32(u32 addr, u32 val)
 {
+    PM9write(PM_ptr, addr, 32, &val);
+
     addr &= ~0x3;
 
     switch (addr & 0xFF000000)

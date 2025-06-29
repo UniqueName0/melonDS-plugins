@@ -237,6 +237,10 @@ private:
 #endif
 
 public: // TODO: Encapsulate the rest of these members
+    void* PM_ptr;
+    void (*PM9read)(void*, unsigned int, unsigned char);
+    void (*PM9write)(void*, unsigned int, unsigned char, void*);
+
     void* UserData;
 
     int ConsoleType;

@@ -36,11 +36,16 @@ PluginManager::PluginManager(EmuInstance* emuInst)
 }
 
 void PluginManager::ndsInit() {
-    emuInstance->getNDS()->ARM9.PM9step = &ARM9step;
-    emuInstance->getNDS()->ARM9.PM_ptr = this;
+    NDS* nds = emuInstance->getNDS();
+    nds->ARM9.PM9step = &ARM9step;
+    nds->ARM9.PM_ptr = this;
 
-    emuInstance->getNDS()->ARM7.PM7step = &ARM7step;
-    emuInstance->getNDS()->ARM7.PM_ptr = this;
+    nds->ARM7.PM7step = &ARM7step;
+    nds->ARM7.PM_ptr = this;
+
+    nds->PM_ptr = this;
+    nds->PM9read = &ARM9read;
+    nds->PM9write = &ARM9write;
 
     Log(LogLevel::Info, "inited nds: %p\n", emuInstance->getNDS());
     Log(LogLevel::Info, "inited nds arm9: %p\n", &(emuInstance->getNDS()->ARM9));
@@ -102,6 +107,22 @@ void ARM9step(void* self, unsigned int addr){
     }
 }
 
+void ARM9read(void* self, unsigned int addr, unsigned char size){
+    PluginManager* pm = (PluginManager*)self;
+    for (int i = 0; i < pm->plugins.size(); ++i) {
+        Plugin* plugin = pm->plugins.at(i);
+        if (plugin->enabled) plugin->ARM9read(addr, size);
+    }
+}
+
+void ARM9write(void* self, unsigned int addr, unsigned char size, void* value){
+    PluginManager* pm = (PluginManager*)self;
+    for (int i = 0; i < pm->plugins.size(); ++i) {
+        Plugin* plugin = pm->plugins.at(i);
+        if (plugin->enabled) plugin->ARM9write(addr, size, value);
+    }
+}
+
 void ARM7step(void* self, unsigned int addr){
     PluginManager* pm = (PluginManager*)self;
     for (int i = 0; i < pm->plugins.size(); ++i) {
@@ -109,7 +130,6 @@ void ARM7step(void* self, unsigned int addr){
         if (plugin->enabled) plugin->ARM7step(addr);
     }
 }
-
 
 
 Plugin::Plugin(EmuInstance* emuInstance, const char* dir, const char* fileName)
@@ -131,6 +151,8 @@ Plugin::Plugin(EmuInstance* emuInstance, const char* dir, const char* fileName)
     clickTopScreen = lib->get_function<void(int, int)>("clickTopScreen");
     clickBottomScreen = lib->get_function<void(int, int)>("clickBottomScreen");
     ARM9step = lib->get_function<void(unsigned int)>("ARM9step");
+    ARM9read = lib->get_function<void(unsigned int, unsigned char)>("ARM9read");
+    ARM9write = lib->get_function<void(unsigned int, unsigned char, void*)>("ARM9write");
     ARM7step = lib->get_function<void(unsigned int)>("ARM7step");
 }
 
@@ -145,7 +167,6 @@ void Plugin::toggleEnabled(bool checked)
     if (checked)
     {
         enabled = true;
-        Log(LogLevel::Info, "enabling plugin\n");
         onEnable();
     }
     else

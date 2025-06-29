@@ -657,6 +657,8 @@ void ARMv5::Execute()
         else
 #endif
         {
+            PM9step(PM_ptr, R[15]);
+
             if (CPSR & 0x20) // THUMB
             {
                 if constexpr (mode == CPUExecuteMode::InterpreterGDB)
@@ -688,7 +690,6 @@ void ARMv5::Execute()
                 if (CheckCondition(CurInstr >> 28))
                 {
                     u32 instrAddr = R[15] - ((CPSR&0x20)?2:4);
-                    PM9step(PM_ptr, instrAddr);
 
                     u32 icode = ((CurInstr >> 4) & 0xF) | ((CurInstr >> 16) & 0xFF0);
                     ARMInterpreter::ARMInstrTable[icode](this);
@@ -799,6 +800,8 @@ void ARMv4::Execute()
         else
 #endif
         {
+            PM7step(PM_ptr, R[15]);
+
             if (CPSR & 0x20) // THUMB
             {
                 if constexpr (mode == CPUExecuteMode::InterpreterGDB)
@@ -829,7 +832,6 @@ void ARMv4::Execute()
                 if (CheckCondition(CurInstr >> 28))
                 {
                     u32 instrAddr = R[15] - ((CPSR&0x20)?2:4);
-                    PM7step(PM_ptr, instrAddr);
 
                     u32 icode = ((CurInstr >> 4) & 0xF) | ((CurInstr >> 16) & 0xFF0);
                     ARMInterpreter::ARMInstrTable[icode](this);
